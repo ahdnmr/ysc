@@ -1,115 +1,228 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Yangın Tüp Listesi</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Yangın Tüp Listesi</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    margin:0;
+    padding:20px;
+}
+
+.kutu{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,0.15);
+    text-align:center;
+    width:100%;
+    max-width:700px;
+}
+
+.logo{
+    width:100%;
+    max-width:400px;
+    height:auto;
+    margin-bottom:25px;
+}
+
+h2{
+    color:#2c3e50;
+    margin-bottom:20px;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    font-size:22px;
+    text-align:center;
+    border:2px solid #3498db;
+    border-radius:8px;
+    margin-bottom:15px;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    font-size:22px;
+    background:#3498db;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#2980b9;
+}
+
+#sonuc{
+    margin-top:20px;
+    overflow-x:auto;
+}
+
+table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:600px;
+    margin-top:20px;
+}
+
+th{
+    background:#2c3e50;
+    color:white;
+    padding:10px;
+}
+
+td{
+    padding:10px;
+}
+
+table,th,td{
+    border:1px solid #bdc3c7;
+}
+
+tr:nth-child(even){
+    background:#ecf0f1;
+}
+
+@media(max-width:768px){
+
+    .kutu{
+        padding:15px;
     }
 
-    table {
-      border-collapse: collapse;
-      width: 80%;
-      margin: auto;
-      margin-top: 10px;
+    h2{
+        font-size:22px;
     }
 
-    th {
-      background-color: #2c3e50;
-      color: white;
-      padding: 8px;
+    input{
+        font-size:18px;
+        padding:12px;
     }
 
-    td {
-      padding: 8px;
-      text-align: center;
+    button{
+        font-size:18px;
+        padding:12px;
     }
 
-    tr:nth-child(even) {
-      background-color: #ecf0f1;
+    th,td{
+        font-size:12px;
+        padding:6px;
     }
 
-    tr:nth-child(odd) {
-      background-color: white;
+    .logo{
+        max-width:250px;
     }
 
-    table, th, td {
-      border: 1px solid #bdc3c7;
-    }
-  </style>
+}
 
-  <!-- ✅ XLSX KÜTÜPHANESİ -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</style>
 
 </head>
 
 <body>
 
-<!-- LOGO -->
-<div>
-  <img src="logo.png" width="350">
+<div class="kutu">
+
+    logo.png
+
+    <h2>🔥 YANGIN TÜPÜ SORGULAMA SİSTEMİ</h2>
+
+    <input
+        id="sayi"
+        type="number"
+        placeholder="TÜP NUMARASI GİRİNİZ">
+
+    <button onclick="liste()">
+        GÖSTER
+    </button>
+
+    <div id="sonuc"></div>
+
 </div>
 
-<br>
-
-<input id="sayi" placeholder="TÜP NUMARASI GİRİNİZ">
-<button onclick="liste()">GÖSTER</button>
-
-<div id="sonuc"></div>
-
 <script>
+
 function liste(){
 
-  let s = document.getElementById("sayi").value;
-  let sonuc = "";
+    let s = document.getElementById("sayi").value;
+    let sonuc = "";
 
-  // 
-  fetch("veri.xlsx")
+    fetch("veri.xlsx")
     .then(res => res.arrayBuffer())
     .then(data => {
 
-      const wb = XLSX.read(data, { type: "array" });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet);
+        const wb = XLSX.read(data,{type:"array"});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
 
-      let index = parseInt(s) - 1;
+        let index = parseInt(s)-1;
 
-      if(json[index]){
+        if(json[index]){
 
-        let row = json[index];
+            let row = json[index];
 
-        sonuc = `
-        <table>
-          <tr>
-            <th>TÜRÜ</th>
-            <th>KONUM</th>
-            <th>KG</th>
-            <th>BASINÇ</th>
-            <th>BASINÇ TEST TARİHİ</th>
-            <th>BAKIM TARİHİ</th>
-          </tr>
+            sonuc = `
+            <table>
 
-          <tr>
-            <td>${row["TÜRÜ"]}</td>
-            <td>${row["KONUM"]}</td>
-            <td>${row["KG"]}</td>
-            <td>${row["BASINÇ"]}</td>
-            <td>${row["BASINÇ TEST TARİHİ"]}</td>
-            <td>${row["BAKIM TARİHİ"]}</td>
-          </tr>
-        </table>
-        `;
-      }
-      else{
-        sonuc = "<b>Tanımsız seçim</b>";
-      }
+                <tr>
+                    <th>TÜRÜ</th>
+                    <th>KONUM</th>
+                    <th>KG</th>
+                    <th>BASINÇ</th>
+                    <th>BASINÇ TEST TARİHİ</th>
+                    <th>BAKIM TARİHİ</th>
+                </tr>
 
-      document.getElementById("sonuc").innerHTML = sonuc;
+                <tr>
+                    <td>${row["TÜRÜ"]}</td>
+                    <td>${row["KONUM"]}</td>
+                    <td>${row["KG"]}</td>
+                    <td>${row["BASINÇ"]}</td>
+                    <td>${row["BASINÇ TEST TARİHİ"]}</td>
+                    <td>${row["BAKIM TARİHİ"]}</td>
+                </tr>
+
+            </table>
+            `;
+        }
+        else{
+
+            sonuc = `
+            <div style="
+            color:red;
+            font-size:22px;
+            font-weight:bold;
+            margin-top:20px;">
+            Tanımsız Seçim
+            </div>
+            `;
+        }
+
+        document.getElementById("sonuc").innerHTML = sonuc;
     });
 
 }
+
 </script>
 
 </body>
